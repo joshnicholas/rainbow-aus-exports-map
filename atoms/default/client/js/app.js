@@ -1,12 +1,12 @@
-// if you want to import a module from shared/js then you can
-// just do e.g. import Scatter from "shared/js/scatter.js"
 var d3 = require("d3");
 
 //Guardian-specific responsive iframe function
 
-iframeMessenger.enableAutoResize();
+var target = "#graphicContainer";
 
 function makeMap(data1, data15, data2) {
+
+	console.log(data15.features)
 
 	centroids = data15.features;
 
@@ -23,7 +23,7 @@ function makeMap(data1, data15, data2) {
 			isMobile = false;
 	}
 
-	var width = document.querySelector("#graphicContainer").getBoundingClientRect().width
+	var width = document.querySelector(target).getBoundingClientRect().width
 	var height = width*0.4;					
 	var margin = {top: 0, right: 0, bottom: 0, left:0};
 
@@ -185,9 +185,9 @@ function makeMap(data1, data15, data2) {
 
 
 
-	d3.select("#graphicContainer svg").remove();
+	// d3.select("#graphicContainer svg").remove();
 
-	var svg = d3.select("#graphicContainer").append("svg")
+	var svg = d3.select(target).append("svg")
 				.attr("width", width + margin.left + margin.right)
 				.attr("height", height + margin.top + margin.bottom)
 				.attr("id", "svg")
@@ -258,9 +258,9 @@ var q = Promise.all([d3.csv("exports@3.csv"),
 						
 						makeMap(exports, centroids, countries)
 						var to=null
-						var lastWidth = document.querySelector("#graphicContainer").getBoundingClientRect()
+						var lastWidth = document.querySelector(target).getBoundingClientRect()
 						window.addEventListener('resize', function() {
-							var thisWidth = document.querySelector("#graphicContainer").getBoundingClientRect()
+							var thisWidth = document.querySelector(target).getBoundingClientRect()
 							if (lastWidth != thisWidth) {
 								window.clearTimeout(to);
 								to = window.setTimeout(function() {
