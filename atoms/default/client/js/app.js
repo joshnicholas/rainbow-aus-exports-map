@@ -1,9 +1,6 @@
 import * as topojson from "topojson"
 import * as d3 from "d3"
 
-
-// /Users/josh_nicholas/github/rainbow-aus-exports-map/atoms/default/client/js/app.js
-
 var target = "#graphicContainer";
 
 function makeMap(data1, data15, data2) {
@@ -183,7 +180,7 @@ function makeMap(data1, data15, data2) {
 
 
 
-	// d3.select("#graphicContainer svg").remove();
+	d3.select("#graphicContainer svg").remove();
 
 	var svg = d3.select(target).append("svg")
 				.attr("width", width + margin.left + margin.right)
@@ -221,7 +218,6 @@ function makeMap(data1, data15, data2) {
 	var exports = []
 	
 	data.forEach(function(d) {exports.push(d.exports)});
-	// data.forEach(function(d) {console.log(d.target)});
 
 	var curves = arcs.selectAll(".curve")
 	.data(d => d.exports)
