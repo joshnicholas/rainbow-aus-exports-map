@@ -5,6 +5,10 @@ var target = "#graphicContainer";
 
 function makeMap(data1, data15, data2) {
 
+	
+
+	var commodities = data1.columns.filter(d => d != "Country");
+
 	var centroids = data15.features;
 
 	var countries = topojson.feature(data2, data2.objects.countries);
@@ -21,8 +25,8 @@ function makeMap(data1, data15, data2) {
 	}
 
 	var width = document.querySelector(target).getBoundingClientRect().width
-	var height = width*0.4;					
-	var margin = {top: 0, right: 0, bottom: 0, left:0};
+	var height = width*0.45;					
+	var margin = {top: 10, right: 10, bottom: 10, left:10};
 
 	width = width - margin.left - margin.right,
     height = height - margin.top - margin.bottom;
@@ -42,8 +46,7 @@ function makeMap(data1, data15, data2) {
 
 	var data = []  
 
-	var keys = Object.keys(data1[0])
-	keys = keys.splice(1,4)
+	var keys = commodities
 
 	function drawCurve(context, source, target) {
 		var midPoint = [(source[0] + target[0])/2, (source[1] + target[1])/2]
@@ -80,7 +83,7 @@ function makeMap(data1, data15, data2) {
 	}
 
 	var colors = d3.scaleOrdinal()
-	.range(['#fb8072', '#999999', '#00bfff','#66c2a5','#fc8d62','#8da0cb','#9970ab', '#e78ac3'])
+	.range(['#fb8072', '#00bfff', '#e78ac3','#66c2a5','#fc8d62','#8da0cb','#9970ab', '#999999'])
 	.domain(keys)
 
 	data1.forEach(d => {
@@ -176,7 +179,7 @@ function makeMap(data1, data15, data2) {
 
 		var nodes = nodeData;
 
-		var shortNodes = nodes.filter(d => (d.total >= 4534984));
+		var shortNodes = nodes.filter(d => (d.total > 1));
 
 
 
@@ -190,7 +193,7 @@ function makeMap(data1, data15, data2) {
 
 	var features = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-	const g= svg.append("g");
+	const g= features.append("g");
 
 	g.append("g")
 	.selectAll("path")
@@ -227,12 +230,12 @@ function makeMap(data1, data15, data2) {
 	.style("stroke", d => colors(d.category))
 	.style("fill", "none")
 	.style("stroke-width", d => d.width)
-	.style("opacity","70%")
+	.style("opacity","80%")
 
 	var nodes = g.append("g")
     .attr("class", "nodes")
 		.selectAll("g")
-		  .data(nodes)
+		  .data(shortNodes)
 		  .enter().append("g")
 	
 	var nodeCircles = nodes.append("circle")
@@ -241,6 +244,47 @@ function makeMap(data1, data15, data2) {
 		.attr("r", d => arcTotalWidth(d.total))
 		.attr("fill","white")
 		.attr("stroke", "black") 
+
+	var size = 10;
+
+	var legend = features.append("g")
+	.attr("class", "legend")
+	// .attr("transform", "translate(" + width*0.60 + "," + height*0.25 + ")")
+	// .attr("transform", "translate(" + margin.left + "," + (height - 150) + ")")
+	.attr("transform", "translate(" + margin.left + "," + 0 + ")")
+	.style("font-size", "12px");
+
+	legend.selectAll("dots")
+	.data(keys)
+	.enter()
+	.append("rect")
+	.attr("y", 5)
+    .attr("x", function(d,i){ return 20 + i*(size+40)})
+    // .attr("x", 100)
+    // .attr("y", function(d,i){ return 100 + i*(size+5)}) // 100 is where the first dot appears. 25 is the distance between dots
+    .attr("width", size)
+    .attr("height", size)
+    .style("fill", function(d){ return colors(d)})
+
+
+	legend.selectAll("dotLabels")
+	.data(keys)
+	.enter()
+	.append("text")
+	.attr("y", 5 + size*2)
+	.attr("x", function(d,i){ return 20 + i*(size+40)}) 
+	//   .attr("x", 100 + size*1.2)
+	//   .attr("y", function(d,i){ return 100 + i*(size+5) + (size/2)}) // 100 is where the first dot appears. 25 is the distance between dots
+	//   .style("fill", function(d){ return colors(d)})
+	.style("fill", "#000000")
+	  .text(function(d){ return d})
+	  .attr("text-anchor", "left")
+	  .style("alignment-baseline", "middle")
+
+
+
+
+	
 
 } 
 
