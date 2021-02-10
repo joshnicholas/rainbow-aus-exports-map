@@ -1,5 +1,5 @@
-var d3 = require("d3");
-
+import * as topojson from "topojson"
+import * as d3 from "d3"
 //Guardian-specific responsive iframe function
 
 var target = "#graphicContainer";
@@ -8,9 +8,9 @@ function makeMap(data1, data15, data2) {
 
 	console.log(data15.features)
 
-	centroids = data15.features;
+	var centroids = data15.features;
 
-	countries = topojson.feature(data2, data2.objects.countries);
+	var countries = topojson.feature(data2, data2.objects.countries);
 
 	var isMobile;
 	var windowWidth = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
@@ -30,15 +30,15 @@ function makeMap(data1, data15, data2) {
 	width = width - margin.left - margin.right,
     height = height - margin.top - margin.bottom;
    
-	projection = d3.geoMercator()
+	var projection = d3.geoMercator()
                 .center([0,0])
                 .scale(width * 0.15)
                 .rotate([-100,0])
 				.translate([width/2,height/2]); 
 				
-	path = d3.geoPath(projection);
+	var path = d3.geoPath(projection);
 
-	color = d3.scaleSequential()
+	var color = d3.scaleSequential()
     .domain(d3.extent(Array.from(data1.values())))
     .interpolator(d3.interpolateYlGnBu)
     .unknown("#ccc");
@@ -56,15 +56,15 @@ function makeMap(data1, data15, data2) {
 		return context
 	  }
 
-	arcTotalWidth = d3.scaleLinear()
+	var arcTotalWidth = d3.scaleLinear()
   	.range([1,30])
 	.domain([1,98944990]);
 
-	arcWidth = d3.scaleLog()
+	var arcWidth = d3.scaleLog()
 		.range([1,10])		
 		.domain([1,100000000]);
 	  
-	getCirclePoints = function(x1,y1,x2,y2,r) {
+	var getCirclePoints = function(x1,y1,x2,y2,r) {
 		var startAngle = Math.atan2(y2- y1, x2-x1) * 180 / Math.PI
 		var angRight = (startAngle + 90 > 360) ? (startAngle + 90 - 360) : (startAngle + 90)
 		var angLeft = (startAngle - 90 < 0) ? 360 - (90 - startAngle) : (startAngle - 90)
@@ -75,14 +75,14 @@ function makeMap(data1, data15, data2) {
 		return {"rightX": rightX, "rightY": rightY, "leftX":leftX, "leftY":leftY}
 	  }
 
-	getLinePoints = function(x1,y1,x2,y2,r) {
+	var getLinePoints = function(x1,y1,x2,y2,r) {
 		var startAngle = Math.atan2(y2- y1, x2-x1)
 		var pointX = x1 + r * Math.cos(startAngle)
 		var pointY = y1 + r * Math.sin(startAngle)
 		return [pointX,pointY]
 	}
 
-	colors = d3.scaleOrdinal()
+	var colors = d3.scaleOrdinal()
 	.range(['#fb8072', '#999999', '#00bfff','#66c2a5','#fc8d62','#8da0cb','#9970ab', '#e78ac3'])
 	.domain(keys)
 
@@ -181,7 +181,7 @@ function makeMap(data1, data15, data2) {
 
 		var nodes = nodeData;
 
-		shortNodes = nodes.filter(d => (d.total >= 4534984));
+		var shortNodes = nodes.filter(d => (d.total >= 4534984));
 
 
 
@@ -250,9 +250,9 @@ function makeMap(data1, data15, data2) {
 
 } 
 
-var q = Promise.all([d3.csv("exports@3.csv"),
+var q = Promise.all([d3.csv("<%= path %>/exports@3.csv"),
 					d3.json("https://raw.githubusercontent.com/gavinr/world-countries-centroids/master/dist/countries.geojson"),
-					d3.json("countries@1.json")])
+					d3.json("<%= path %>/countries@1.json")])
 
 					.then(([exports, centroids, countries]) => {
 						
