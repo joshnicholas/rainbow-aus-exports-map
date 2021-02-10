@@ -1,12 +1,12 @@
 import * as topojson from "topojson"
 import * as d3 from "d3"
-//Guardian-specific responsive iframe function
+
+
+// /Users/josh_nicholas/github/rainbow-aus-exports-map/atoms/default/client/js/app.js
 
 var target = "#graphicContainer";
 
 function makeMap(data1, data15, data2) {
-
-	console.log(data15.features)
 
 	var centroids = data15.features;
 
@@ -89,7 +89,7 @@ function makeMap(data1, data15, data2) {
 	data1.forEach(d => {
 		var newRow = {}
 		var source = centroids.find(c => c.properties.COUNTRY == "Australia").geometry.coordinates
-		console.log(d.Country)
+
 		var target = centroids.find(c => c.properties.COUNTRY == d.Country).geometry.coordinates
 		newRow['targetName'] = d.Country
 		
@@ -101,8 +101,6 @@ function makeMap(data1, data15, data2) {
 		var totalCounter = 0
 		keys.forEach(key => {
 			totalCounter = totalCounter + +d[key]
-			// console.log(+d[key])
-			// console.log(totalCounter)
 		})
 		
 		newRow['total'] = totalCounter
