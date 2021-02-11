@@ -5,11 +5,16 @@ var target = "#graphicContainer";
 
 function makeMap(data1, data15, data2) {
 
+	console.log(data1)
 	
 
 	var commodities = data1.columns.filter(d => d != "Country");
 
 	var centroids = data15.features;
+
+	console.log(centroids.find(c => c.properties.COUNTRY == "Australia"))
+
+	// centroids.find(c => c.properties.COUNTRY == "Australia").geometry.coordinates
 
 	var countries = topojson.feature(data2, data2.objects.countries);
 
@@ -89,7 +94,7 @@ function makeMap(data1, data15, data2) {
 	data1.forEach(d => {
 		var newRow = {}
 		var source = centroids.find(c => c.properties.COUNTRY == "Australia").geometry.coordinates
-
+		console.log(d.Country)
 		var target = centroids.find(c => c.properties.COUNTRY == d.Country).geometry.coordinates
 		newRow['targetName'] = d.Country
 		
@@ -247,7 +252,7 @@ function makeMap(data1, data15, data2) {
 
 	var size = 10;
 
-	var legend = features.append("g")
+	var legend = features.append("svg")
 	.attr("class", "legend")
 	// .attr("transform", "translate(" + width*0.60 + "," + height*0.25 + ")")
 	// .attr("transform", "translate(" + margin.left + "," + (height - 150) + ")")
