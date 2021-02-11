@@ -29,9 +29,9 @@ function makeMap(data1, data2, data3) {
     height = height - margin.top - margin.bottom;
    
 	var projection = d3.geoMercator()
-                .center([0,0])
+                .center([0,20])
                 .scale(width * 0.15)
-                .rotate([-100,0])
+                .rotate([-145,0])
 				.translate([width/2,height/2]); 
 				
 	var path = d3.geoPath(projection);
@@ -226,7 +226,7 @@ function makeMap(data1, data2, data3) {
 	.style("stroke", d => colors(d.category))
 	.style("fill", "none")
 	.style("stroke-width", d => d.width)
-	.style("opacity","80%")
+	.style("opacity","60%")
 
 	var nodes = g.append("g")
     .attr("class", "nodes")
