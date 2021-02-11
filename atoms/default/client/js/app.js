@@ -80,7 +80,7 @@ function makeMap(data1, data2, data3) {
 	}
 
 	var colors = d3.scaleOrdinal()
-	.range(['#fb8072', '#00bfff', '#e78ac3','#66c2a5','#FFFF00','#8da0cb','#9970ab', '#999999'])
+	.range(['#d10a10', '#0099db', '#4f524a','#de007e','#ffe500',' #b29163','#9970ab', '#bbce00', "#ea5a0b"])
 	.domain(keys)
 
 	data1.forEach(d => {
