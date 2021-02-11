@@ -1,20 +1,12 @@
 import * as topojson from "topojson"
 import * as d3 from "d3"
-
 var target = "#graphicContainer";
 
-function makeMap(data1, data15, data2) {
+function makeMap(data1, data2, data3) {
 
-	console.log(data1)
-	
+	var new_centroids = data3.features
 
 	var commodities = data1.columns.filter(d => d != "Country");
-
-	var centroids = data15.features;
-
-	console.log(centroids.find(c => c.properties.COUNTRY == "Australia"))
-
-	// centroids.find(c => c.properties.COUNTRY == "Australia").geometry.coordinates
 
 	var countries = topojson.feature(data2, data2.objects.countries);
 
@@ -93,9 +85,9 @@ function makeMap(data1, data15, data2) {
 
 	data1.forEach(d => {
 		var newRow = {}
-		var source = centroids.find(c => c.properties.COUNTRY == "Australia").geometry.coordinates
-		console.log(d.Country)
-		var target = centroids.find(c => c.properties.COUNTRY == d.Country).geometry.coordinates
+		var source = new_centroids.find(c => c.properties.name_long == "Australia").geometry.coordinates
+		// console.log(d.Country)
+		var target = new_centroids.find(c => c.properties.name_long == d.Country).geometry.coordinates
 		newRow['targetName'] = d.Country
 		
 		newRow['sourceName'] = "Australia"
@@ -112,7 +104,6 @@ function makeMap(data1, data15, data2) {
 		
 		keys.forEach(key => {
 			var width = (+d[key]/newRow['total']) * arcTotalWidth(newRow['total'])
-			// console.log(width)
 			var position = posCounter + width/2 
 			totalCounter = totalCounter + +d[key]
 			newRow['exports'].push({"category": key, "value": +d[key], "position":position, "width":width})
@@ -294,12 +285,12 @@ function makeMap(data1, data15, data2) {
 } 
 
 var q = Promise.all([d3.csv("<%= path %>/exports@3.csv"),
-					d3.json("https://raw.githubusercontent.com/gavinr/world-countries-centroids/master/dist/countries.geojson"),
-					d3.json("<%= path %>/countries@1.json")])
+					d3.json("<%= path %>/countries@1.json"),
+					d3.json("<%= path %>/country_centroids_az8.json")])
 
-					.then(([exports, centroids, countries]) => {
+					.then(([exports, countries, new_centroids]) => {
 						
-						makeMap(exports, centroids, countries)
+						makeMap(exports, countries, new_centroids)
 						var to=null
 						var lastWidth = document.querySelector(target).getBoundingClientRect()
 						window.addEventListener('resize', function() {
@@ -308,7 +299,7 @@ var q = Promise.all([d3.csv("<%= path %>/exports@3.csv"),
 								window.clearTimeout(to);
 								to = window.setTimeout(function() {
 
-										makeMap(exports, centroids, countries)
+										makeMap(exports, countries, new_centroids)
 
 									}, 500)
 				}
