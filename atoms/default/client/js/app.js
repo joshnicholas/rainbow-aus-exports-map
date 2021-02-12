@@ -4,6 +4,8 @@ var target = "#graphicContainer";
 
 function makeMap(data1, data2, data3) {
 
+	d3.select("#chartTitle").text("test")
+
 	var new_centroids = data3.features
 
 	var commodities = data1.columns.filter(d => d != "Country");
