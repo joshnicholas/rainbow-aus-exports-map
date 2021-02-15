@@ -1,24 +1,25 @@
 import * as topojson from "topojson"
 import * as d3 from "d3"
 import { makeTooltip } from './modules/tooltips'
+
 var target = "#graphicContainer";
 
 function makeMap(data1, data2, data3) {
 
 	/// Insert chart title, standfirst, source etc.
 
-	d3.select("#chartTitle").text("Top ten destinations for Australia's main exports")
+	d3.select("#chartTitle").text("Top destinations for Australia's major exports")
 
-	d3.select("#subTitle").text("China is the dominant market for Australia's major exports")
+	d3.select("#subTitle").text("China was Australia's dominant market in 2018")
 
-	d3.select("#sourceText").text("| Guardian analysis of CEPI's BACI dataset")
+	d3.select("#sourceText").text("| Guardian analysis of CEPII's BACI dataset")
 
 	var new_centroids = data3.features
 
 	var commodities = data1.columns.filter(d => d != "Country");
 
 	var max_val = d3.max(data1.map(d => +d["Iron ore"]))
-	console.log(max_val)
+	// console.log(max_val)
 
 	var countries = topojson.feature(data2, data2.objects.countries);
 
@@ -69,6 +70,10 @@ function makeMap(data1, data2, data3) {
   	.range([1,30])
 	.domain([1,71000000000]);
 
+	var nodeWidth = d3.scaleLinear()
+	.range([5,30])
+  	.domain([1,71000000000]);
+
 	var arcWidth = d3.scaleLog()
 		.range([1,10])		
 		.domain([1,max_val]);
@@ -95,6 +100,8 @@ function makeMap(data1, data2, data3) {
 	.range(['#d10a10', '#0099db', '#4f524a','#de007e','#ffe500',' #b29163','#9970ab', '#bbce00', "#ea5a0b"])
 	.domain(keys)
 
+	// console.log(data1)
+
 	data1.forEach(d => {
 		var newRow = {}
 		var source = new_centroids.find(c => c.properties.name_long == "Australia").geometry.coordinates
@@ -103,22 +110,22 @@ function makeMap(data1, data2, data3) {
 		newRow['targetName'] = d.Country
 		
 		newRow['sourceName'] = "Australia"
-		newRow['exports'] = []
+		newRow['imports'] = []
 		newRow['source'] = source
 		newRow['target'] = target
 		var posCounter = 0
 		var totalCounter = 0
 		keys.forEach(key => {
 			totalCounter = totalCounter + +d[key]
+			// newRow[key] = +d[key]
 		})
-		
 		newRow['total'] = totalCounter
 		
 		keys.forEach(key => {
 			var width = (+d[key]/newRow['total']) * arcTotalWidth(newRow['total'])
 			var position = posCounter + width/2 
 			totalCounter = totalCounter + +d[key]
-			newRow['exports'].push({"category": key, "value": +d[key], "position":position, "width":width})
+			newRow['imports'].push({"category": key, "value": +d[key], "position":position, "width":width})
 			posCounter = posCounter + width
 		})
 		
@@ -137,7 +144,7 @@ function makeMap(data1, data2, data3) {
 			arcTotalWidth(newRow['total'])/2
 		)
 		
-		newRow['exports'].forEach(e => {
+		newRow['imports'].forEach(e => {
 			e.source = getLinePoints(
 			newRow['sourcePoints'].leftX,
 			newRow['sourcePoints'].leftY,
@@ -157,7 +164,6 @@ function makeMap(data1, data2, data3) {
 		data.push(newRow)
 		})
 
-		
 		var nodeData = []
 		var totals = []
 		var uniques = new Set()
@@ -167,6 +173,7 @@ function makeMap(data1, data2, data3) {
 			newRow['nodeName'] = d.targetName
 			newRow['location'] = d.target
 			newRow['total'] = d.total
+			newRow['imports'] = d.imports
 			totals.push(d.total)
 			uniques.add(d.targetName)
 			nodeData.push(newRow)
@@ -231,7 +238,7 @@ function makeMap(data1, data2, data3) {
 	data.forEach(function(d) {exports.push(d.exports)});
 
 	var curves = arcs.selectAll(".curve")
-	.data(d => d.exports)
+	.data(d => d.imports)
 	.enter()
 	.append("path")
 	.attr("class", "curves")
@@ -241,6 +248,8 @@ function makeMap(data1, data2, data3) {
 	.style("stroke-width", d => d.width)
 	.style("opacity","60%")
 
+	var countries_sorted = nodeData.sort((a, b) => d3.descending(+a['total'], +b['total']))
+	var top_five = countries_sorted.filter(d => d.nodeName != "Australia").map(d => d.nodeName).slice(0, 5)
 
 	var nodes = g.append("g")
     .attr("class", "nodes")
@@ -258,54 +267,188 @@ function makeMap(data1, data2, data3) {
 		.attr("r", function(d){
 			if (d.nodeName == "Australia"){
 				// var oz_total = (d.total / country_array.length)
-				var oz_total = (d.total / 10)
-				return arcTotalWidth(oz_total)
+				var oz_total = (d.total / 5)
+				return nodeWidth(oz_total)
 			} else {
-				return arcTotalWidth(d.total)
+				return nodeWidth(d.total)
 			}
 		})
 		.attr("Country", d => d.nodeName)
 		.attr("Total", d => d.total)
+		.attr("Imports", d=> d.imports)
 		.attr("fill","white")
-		.attr("stroke", "black") 
+		.attr("stroke", "black")
+	
 
-	var size = 10;
+	/// APPEND COUNTRY LABELS, REMOVE SOUTH KOREA IF SCREEN IS SMALL
+
+	if (windowWidth > 1000) {
+		nodes.append("text")
+		.attr("x", d => projection(d.location)[0])
+		.attr("y",d => projection(d.location)[1] - nodeWidth(d.total) - 5)
+		.style("font-size", "0.75em")
+		.style("fill", "#000000")
+		.attr("text-anchor", "middle")
+		.text(function(d){
+			if (top_five.includes(d.nodeName) && d.nodeName != "Republic of Korea"){
+				return d.nodeName
+			} if (d.nodeName == "Republic of Korea"){
+				return "South Korea"
+			}
+		})
+	} else {
+		nodes.append("text")
+		.attr("x", d => projection(d.location)[0])
+		.attr("y",d => projection(d.location)[1] - nodeWidth(d.total) - 5)
+		.style("font-size", "0.75em")
+		.style("fill", "#000000")
+		.attr("text-anchor", "middle")
+		.text(function(d){
+			if (top_five.includes(d.nodeName) && d.nodeName != "Republic of Korea"){
+				return d.nodeName
+			} 
+		})
+	}
+
+
+
+
+	// var size = 10;
 
 	var legend = features.append("svg")
 	.attr("class", "legend")
 	// .attr("transform", "translate(" + width*0.60 + "," + height*0.25 + ")")
 	// .attr("transform", "translate(" + margin.left + "," + (height - 150) + ")")
-	.attr("transform", "translate(" + margin.left + "," + 0 + ")")
-	.style("font-size", "12px");
+	.attr("transform", "translate(" + 10 + "," + 100 + ")")
+	.style("font-size", "1em");
 
-	legend.selectAll("dots")
-	.data(keys)
-	.enter()
-	.append("rect")
-	.attr("y", 5)
-    .attr("x", function(d,i){ return 20 + i*(size+40)})
-    // .attr("x", 100)
-    // .attr("y", function(d,i){ return 100 + i*(size+5)}) // 100 is where the first dot appears. 25 is the distance between dots
-    .attr("width", size)
-    .attr("height", size)
-    .style("fill", function(d){ return colors(d)})
-
-
-	legend.selectAll("dotLabels")
-	.data(keys)
-	.enter()
-	.append("text")
-	.attr("y", 5 + size*2)
-	.attr("x", function(d,i){ return 20 + i*(size+40)}) 
-	//   .attr("x", 100 + size*1.2)
-	//   .attr("y", function(d,i){ return 100 + i*(size+5) + (size/2)}) // 100 is where the first dot appears. 25 is the distance between dots
-	//   .style("fill", function(d){ return colors(d)})
-	.style("fill", "#000000")
-	  .text(function(d){ return d})
-	  .attr("text-anchor", "left")
-	  .style("alignment-baseline", "middle")
+	// legend.selectAll("dots")
+	// .data(keys)
+	// .enter()
+	// .append("rect")
+	// .attr("y", 5)
+    // .attr("x", function(d,i){ return 20 + i*(size+40)})
+    // // .attr("x", 100)
+    // // .attr("y", function(d,i){ return 100 + i*(size+5)}) // 100 is where the first dot appears. 25 is the distance between dots
+    // .attr("width", size)
+    // .attr("height", size)
+    // .style("fill", function(d){ return colors(d)})
 
 
+	// legend.selectAll("dotLabels")
+	// .data(keys)
+	// .enter()
+	// .append("text")
+	// .attr("y", 5 + size*2)
+	// .attr("x", function(d,i){ return 20 + i*(size+40)}) 
+	// //   .attr("x", 100 + size*1.2)
+	// //   .attr("y", function(d,i){ return 100 + i*(size+5) + (size/2)}) // 100 is where the first dot appears. 25 is the distance between dots
+	// //   .style("fill", function(d){ return colors(d)})
+	// .style("fill", "#000000")
+	//   .text(function(d){ return d})
+	//   .attr("text-anchor", "left")
+	//   .style("alignment-baseline", "middle")
+
+	var labels = commodities;
+
+	var footerAnnotations = d3.select("#footerAnnotations");
+	
+	footerAnnotations.html("");	
+
+
+	var x = d3.scaleBand()
+	.range([0, width])
+	.paddingInner(0.08);
+	x.domain(labels);
+
+	console.log(x.bandwidth())
+
+	var y = d3.scaleLinear().range([height, 0]);
+
+	// var features = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+	function textPadding(d) {
+		if (d > 0) {
+			return 12
+		}
+
+		else {
+			return - 2
+		}
+	}
+
+	function textPaddingMobile(d) {
+		if (d > 0) {
+			return 12
+		}
+
+		else {
+			return 4
+		}
+	}	
+
+ 	var	size = 5; 
+
+	var padding = 12;
+
+	if (isMobile) {
+
+		padding = 4
+	
+
+		features.selectAll(".annotationCircles")
+				.data(labels)
+				.enter()
+				.append("circle")
+				.attr("class", "annotationCircle")
+				.attr("cy", height - padding)
+				.attr("cx", function(d, i) { 
+					return x(d) + x.bandwidth()/2})
+				.attr("r", size)
+				.attr("fill", function(d){
+					return colors(d)
+				});
+
+		features.selectAll(".annotationText")
+			.data(labels)
+			.enter().append("text")
+			.attr("class", "annotationText")
+			.attr("y", height - size - padding - 10)
+			.attr("x", function(d,i){ return x(d) + x.bandwidth()/2})
+			.style("text-anchor", "middle")
+			.style("opacity", 1)
+			.style("font-size", "0.75em")
+			.text(function(d) {return d});
+		}
+
+	
+			
+			else {
+
+		features.selectAll(".annotationCircles")
+				.data(labels)
+				.enter()
+				.append("circle")
+				.attr("class", "annotationCircle")
+				.attr("cy", height - padding)
+				.attr("cx", function(d, i) { 
+					return x(d) + x.bandwidth()/2})
+				.attr("r", size)
+				.attr("fill", function(d){
+					return colors(d)
+				});
+
+		features.selectAll(".annotationText")
+			.data(labels)
+			.enter().append("text")
+			.attr("class", "annotationText")
+			.attr("y", height - size - padding - 10)
+			.attr("x", function(d,i){ return x(d) + x.bandwidth()/2})
+			.style("text-anchor", "middle")
+			.style("opacity", 1)
+			.style("font-size", "1em")
+			.text(function(d) {return d});
+
+	}	
 
 
 	

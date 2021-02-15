@@ -1,8 +1,9 @@
 import * as d3 from "d3"
+import { numberFormat } from './numberFormat'
 
 function makeTooltip(el, data) {
 
-	console.log("make", el)
+	// console.log("make", el)
 
 
 	var els = d3.selectAll(el)
@@ -15,11 +16,22 @@ function makeTooltip(el, data) {
 		    .style("opacity", 0);
 
 	els.on("mouseover.tooltip", function(d, i) {
-		console.log(i)
+		var country = i.nodeName;
+		var country_array = data.find(d => d.nodeName == country)
+
+		var text = ""
 		if (i.nodeName == "Australia"){
-			var text = `<b>Country: ${i.nodeName}<br>Total exported: ${i.total}</b>`
-		} else {
-			var text = `<b>Country: ${i.nodeName}<br>Total Imported: ${i.total}</b>`
+			text += `<b>${i.nodeName} exports:</b>			
+			<br>Total: ${numberFormat(i.total)} USD`
+			console.log(country_array)
+		} else { 
+			text += `<b>${i.nodeName} imports:</b>`
+			country_array.imports.forEach(function(d){
+				if (+d.value > 0){
+			text += `<br>${d.category}: ${numberFormat(d.value)} USD`
+				}
+			})
+			// var text = `<b>Country: ${i.nodeName}<br>Total Imported: ${numberFormat(i.total)}</b>`
 		}
 		tooltip.transition()
 			.duration(200)
@@ -32,8 +44,6 @@ function makeTooltip(el, data) {
 		var mouseX = d3.pointer(d)[0]
         var mouseY = d3.pointer(d)[1]
 
-		console.log(mouseX)
-		console.log(mouseY)
         var half = width/2;
 
         if (mouseX < half) {
