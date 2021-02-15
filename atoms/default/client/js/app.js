@@ -1,14 +1,24 @@
 import * as topojson from "topojson"
 import * as d3 from "d3"
+import { makeTooltip } from './modules/tooltips'
 var target = "#graphicContainer";
 
 function makeMap(data1, data2, data3) {
 
-	d3.select("#chartTitle").text("test")
+	/// Insert chart title, standfirst, source etc.
+
+	d3.select("#chartTitle").text("Top ten destinations for Australia's main exports")
+
+	d3.select("#subTitle").text("China is the dominant market for Australia's major exports")
+
+	d3.select("#sourceText").text("| Guardian analysis of CEPI's BACI dataset")
 
 	var new_centroids = data3.features
 
 	var commodities = data1.columns.filter(d => d != "Country");
+
+	var max_val = d3.max(data1.map(d => +d["Iron ore"]))
+	console.log(max_val)
 
 	var countries = topojson.feature(data2, data2.objects.countries);
 
@@ -57,11 +67,11 @@ function makeMap(data1, data2, data3) {
 
 	var arcTotalWidth = d3.scaleLinear()
   	.range([1,30])
-	.domain([1,98944990]);
+	.domain([1,71000000000]);
 
 	var arcWidth = d3.scaleLog()
 		.range([1,10])		
-		.domain([1,100000000]);
+		.domain([1,max_val]);
 	  
 	var getCirclePoints = function(x1,y1,x2,y2,r) {
 		var startAngle = Math.atan2(y2- y1, x2-x1) * 180 / Math.PI
@@ -169,17 +179,16 @@ function makeMap(data1, data2, data3) {
 			if (!uniques.has(d.sourceName)) {
 			newRow['nodeName'] = d.sourceName
 			newRow['location'] = d.source
-			newRow['total'] = d3.max(totals)
+			newRow['total'] = d3.sum(totals)
 			uniques.add(d.sourceName)
 			nodeData.push(newRow)
 		  }
 		})
 
-		var nodes = nodeData;
+		// var nodes = nodeData;
 
-		var shortNodes = nodes.filter(d => (d.total > 1));
-
-
+	var shortNodes = nodeData.filter(d => (d.total > 1));
+	var country_array = shortNodes.map(d => d.nodeName)
 
 	d3.select("#graphicContainer svg").remove();
 
@@ -195,6 +204,7 @@ function makeMap(data1, data2, data3) {
 
 	g.append("g")
 	.selectAll("path")
+
 	.data(countries.features)
 	.enter()
 	.append("path")
@@ -224,22 +234,38 @@ function makeMap(data1, data2, data3) {
 	.data(d => d.exports)
 	.enter()
 	.append("path")
+	.attr("class", "curves")
 	.attr("d", d => drawCurve(d3.path(), d.source, d.target))
 	.style("stroke", d => colors(d.category))
 	.style("fill", "none")
 	.style("stroke-width", d => d.width)
 	.style("opacity","60%")
 
+
 	var nodes = g.append("g")
     .attr("class", "nodes")
 		.selectAll("g")
 		  .data(shortNodes)
 		  .enter().append("g")
+		  .attr("class", "node")
+
+
+	makeTooltip(".node", shortNodes);	
 	
 	var nodeCircles = nodes.append("circle")
 		.attr("cx",d => projection(d.location)[0])
 		.attr("cy",d => projection(d.location)[1])
-		.attr("r", d => arcTotalWidth(d.total))
+		.attr("r", function(d){
+			if (d.nodeName == "Australia"){
+				// var oz_total = (d.total / country_array.length)
+				var oz_total = (d.total / 10)
+				return arcTotalWidth(oz_total)
+			} else {
+				return arcTotalWidth(d.total)
+			}
+		})
+		.attr("Country", d => d.nodeName)
+		.attr("Total", d => d.total)
 		.attr("fill","white")
 		.attr("stroke", "black") 
 

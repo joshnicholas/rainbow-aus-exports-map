@@ -1,9 +1,22 @@
-@import "fonts";
+@import "charts";
 @import "mq";
-@import "palette";
-// @import "enhancer";
+@import "fonts";
+// @import "palette";
+// Uncomment for embeds
+// @import "embed";
+// Uncomment for full screen (including immersive article main media)
+//@import "fullscreen";
 
-.interactive-atom {
-    margin: 0;
-    padding: 0;
+figure {
+	margin: 0;
+}	
+
+.interactive-wrapper {
+    margin: 0 !important;
+
+#graphicContainer {
+	position:relative;
+	max-width: 1200px;
+}
+
 }
