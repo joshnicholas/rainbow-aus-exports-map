@@ -388,7 +388,7 @@ function makeMap(data1, data2, data3) {
 
  	var	size = 5; 
 
-	var padding = 12;
+	var padding = 5;
 
 	if (isMobile) {
 
