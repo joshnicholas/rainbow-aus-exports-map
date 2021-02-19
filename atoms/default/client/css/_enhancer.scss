@@ -7,7 +7,10 @@
 //@import "fullscreen";
 .element-atom,
 .interactive-atom {
-    margin: 0 !important;
+    margin-left: 0 !important;
+}
+.interactive-atom {
+  margin-bottom: 1rem;
 }
 
 .content--interactive .content__headline, .headline {
@@ -100,7 +103,7 @@ a, .u-fauxlink {
   border-top: none;
 }
 .content__main-column--interactive {
-    & > p,& > h2,& > ul, & > sub,  .element-interactive,.element-atom,.element-video {
+    & > p,& > h2,& > ul, & > sub,  .element-interactive,.element-atom,.element-video, .element-image {
 
       // strong {
       //   background-color: $highlight_yellow;
@@ -136,13 +139,13 @@ a, .u-fauxlink {
     }
 
     & > h2 {
-    	font-family: "Guardian Headline", "Guardian Egyptian Web", Georgia;
-    	font-size: 28px;
-    	line-height: 1.36;
-    	font-weight: 700;
-    	color: #333;
-    	margin-top: 36px;
-    	margin-bottom: 6px;
+      font-family: "Guardian Headline", "Guardian Egyptian Web", Georgia;
+      font-size: 28px;
+      line-height: 1.36;
+      font-weight: 700;
+      color: #333;
+      margin-top: 36px;
+      margin-bottom: 6px;
 
       @include mq($until: desktop) {
         font-size: 24px;
@@ -150,8 +153,8 @@ a, .u-fauxlink {
 
     }
     .element--immersive {
-    	max-width: initial;
-    	margin-left: 0 !important;
+      max-width: initial;
+      margin-left: 0 !important;
         margin-bottom: 48px !important;
         font-size: 0;
 
@@ -208,6 +211,27 @@ a, .u-fauxlink {
     }
 }
 
+.gu-image {
+  width: 100%;
+  height: 100%;
+
+}
+
+@media (min-width: 81.25em) {
+  .element--immersive figcaption, .element--supporting figcaption {
+        width: 13.75rem;
+        float: left;
+  }
+
+  .element-image.element--supporting {
+    margin-left: 0px !important;
+    background: none;
+  }
+}
+
+
+
+
 .image {
     position: relative;
     width: 100%;
@@ -252,6 +276,22 @@ a, .u-fauxlink {
     }
 }
 
+/*#article {
+    .element-image {
+    max-width: 620px;
+  }
+}
+*/
+
+.element-image figcaption {
+  font-size: 0.75em;
+  line-height: 1em;
+  font-family: "Guardian Text Sans Web","Helvetica Neue",Helvetica,Arial,"Lucida Grande",sans-serif;
+  color: #767676;
+  padding-top: 0.5em;
+}
+
+
 .interactive-grid__caption {
     display: block;
     max-width: 180px;
@@ -280,6 +320,15 @@ a, .u-fauxlink {
     padding: 3px 2px 2px 4px;
     box-decoration-break: clone;
     -webkit-box-decoration-break: clone;
+}
+
+.android, .ios {
+
+  .element-image figcaption {
+    font-size: 14px;
+    line-height: 17px;
+  }
+
 }
 
 

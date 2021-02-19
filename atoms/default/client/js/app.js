@@ -390,65 +390,87 @@ function makeMap(data1, data2, data3) {
 
 	var padding = 5;
 
-	if (isMobile) {
+	var chartKey = d3.select("#chartKey");
+	chartKey.html("");
 
-		padding = 4
+	labels.forEach(function(key,i) { 
+
+		var keyDiv = chartKey.append("div")
+						.attr("class","keyDiv")
+
+		keyDiv.append("span")
+			.attr("class", "keyCircle")
+			.style("background-color", function() {
+					return colors(key);
+				}
+			)
+
+		keyDiv.append("span")
+			.attr("class", "keyText")
+			.text(key)
+
+	})
+
+
+	// if (isMobile) {
+
+	// 	padding = 4
 	
 
-		features.selectAll(".annotationCircles")
-				.data(labels)
-				.enter()
-				.append("circle")
-				.attr("class", "annotationCircle")
-				.attr("cy", height - padding)
-				.attr("cx", function(d, i) { 
-					return x(d) + x.bandwidth()/2})
-				.attr("r", size)
-				.attr("fill", function(d){
-					return colors(d)
-				});
+	// 	features.selectAll(".annotationCircles")
+	// 			.data(labels)
+	// 			.enter()
+	// 			.append("circle")
+	// 			.attr("class", "annotationCircle")
+	// 			.attr("cy", height - padding)
+	// 			.attr("cx", function(d, i) { 
+	// 				return x(d) + x.bandwidth()/2})
+	// 			.attr("r", size)
+	// 			.attr("fill", function(d){
+	// 				return colors(d)
+	// 			});
 
-		features.selectAll(".annotationText")
-			.data(labels)
-			.enter().append("text")
-			.attr("class", "annotationText")
-			.attr("y", height - size - padding - 10)
-			.attr("x", function(d,i){ return x(d) + x.bandwidth()/2})
-			.style("text-anchor", "middle")
-			.style("opacity", 1)
-			.style("font-size", "0.75em")
-			.text(function(d) {return d});
-		}
+	// 	features.selectAll(".annotationText")
+	// 		.data(labels)
+	// 		.enter().append("text")
+	// 		.attr("class", "annotationText")
+	// 		.attr("y", height - size - padding - 10)
+	// 		.attr("x", function(d,i){ return x(d) + x.bandwidth()/2})
+	// 		.style("text-anchor", "middle")
+	// 		.style("opacity", 1)
+	// 		.style("font-size", "0.75em")
+	// 		.text(function(d) {return d});
+	// 	}
 
 	
 			
-			else {
+	// 		else {
 
-		features.selectAll(".annotationCircles")
-				.data(labels)
-				.enter()
-				.append("circle")
-				.attr("class", "annotationCircle")
-				.attr("cy", height - padding)
-				.attr("cx", function(d, i) { 
-					return x(d) + x.bandwidth()/2})
-				.attr("r", size)
-				.attr("fill", function(d){
-					return colors(d)
-				});
+	// 	features.selectAll(".annotationCircles")
+	// 			.data(labels)
+	// 			.enter()
+	// 			.append("circle")
+	// 			.attr("class", "annotationCircle")
+	// 			.attr("cy", height - padding)
+	// 			.attr("cx", function(d, i) { 
+	// 				return x(d) + x.bandwidth()/2})
+	// 			.attr("r", size)
+	// 			.attr("fill", function(d){
+	// 				return colors(d)
+	// 			});
 
-		features.selectAll(".annotationText")
-			.data(labels)
-			.enter().append("text")
-			.attr("class", "annotationText")
-			.attr("y", height - size - padding - 10)
-			.attr("x", function(d,i){ return x(d) + x.bandwidth()/2})
-			.style("text-anchor", "middle")
-			.style("opacity", 1)
-			.style("font-size", "1em")
-			.text(function(d) {return d});
+	// 	features.selectAll(".annotationText")
+	// 		.data(labels)
+	// 		.enter().append("text")
+	// 		.attr("class", "annotationText")
+	// 		.attr("y", height - size - padding - 10)
+	// 		.attr("x", function(d,i){ return x(d) + x.bandwidth()/2})
+	// 		.style("text-anchor", "middle")
+	// 		.style("opacity", 1)
+	// 		.style("font-size", "1em")
+	// 		.text(function(d) {return d});
 
-	}	
+	// }	
 
 
 	
