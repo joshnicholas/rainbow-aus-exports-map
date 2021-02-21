@@ -8,6 +8,9 @@ function makeMap(data1, data2, data3) {
 
 	/// Insert chart title, standfirst, source etc.
 
+	d3.select(".interactive-wrapper")
+	.style("background-color", 'white')
+
 	d3.select("#chartTitle").text("Top destinations for Australia's major exports")
 
 	d3.select("#subTitle").text("China was Australia's dominant market in 2018")

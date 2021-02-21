@@ -22,13 +22,13 @@ function makeTooltip(el, data) {
 		var text = ""
 		if (i.nodeName == "Australia"){
 			text += `<b>${i.nodeName} exports:</b>			
-			<br>Total: ${numberFormat(i.total)} USD`
+			<br>Total: US$${numberFormat(i.total)}`
 			console.log(country_array)
 		} else { 
 			text += `<b>${i.nodeName} imports:</b>`
 			country_array.imports.forEach(function(d){
 				if (+d.value > 0){
-			text += `<br>${d.category}: ${numberFormat(d.value)} USD`
+			text += `<br>${d.category}: US$${numberFormat(d.value)}`
 				}
 			})
 			// var text = `<b>Country: ${i.nodeName}<br>Total Imported: ${numberFormat(i.total)}</b>`
